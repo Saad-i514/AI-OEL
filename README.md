@@ -7,9 +7,18 @@ UI: streamlit run ui/app.py
 
 ## Use a real LLM backend
 
-The offline default is a mock and must not be reported as real LLM results. The dispatcher accepts any
-OpenAI-compatible chat-completions endpoint, including Ollama Cloud, a local vLLM server, or Mistral.
-Set credentials in environment variables; never commit API keys.
+The dispatcher uses OpenAI's `gpt-6-luna` model when `OPENAI_API_KEY` is configured; it is OpenAI's
+most efficient model for focused, high-volume tasks. It costs $0.10 per 1M input tokens and $0.50 per
+1M output tokens at standard rates. The offline default remains a mock when no key is configured, and
+mock results must not be reported as real LLM results. See [OpenAI model details](https://developers.openai.com/api/docs/models/gpt-6-luna)
+and [current pricing](https://developers.openai.com/api/docs/pricing).
+
+Copy `.env.example` to `.env`, then set `OPENAI_API_KEY` in `.env`. The file is ignored by Git.
+Run `python -m src.llm_agent --ask "Deliver stop 3 first"` for one live request. The Streamlit UI
+also has an **LLM dispatcher** tab that uses this configuration.
+
+The dispatcher also accepts OpenAI-compatible endpoints, including Ollama Cloud, local vLLM, and
+Mistral. Set credentials in environment variables; never commit API keys.
 
 For Ollama Cloud in PowerShell:
 

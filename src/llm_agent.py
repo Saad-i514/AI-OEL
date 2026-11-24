@@ -2,20 +2,22 @@
 Run:  python -m src.llm_agent                      (full experiment: direct planner vs LLM raw vs LLM + validation)
       python -m src.llm_agent --ask "Deliver stop 3 first"     (one live request, for the viva)
 Backend (environment variables):
-   OEL_LLM_BACKEND = anthropic | openai | mock      OEL_LLM_MODEL = model name      OEL_LLM_BASE_URL = for 'openai' backend
+   OEL_LLM_BACKEND = anthropic | openai | mock      OEL_LLM_MODEL = model name      OEL_LLM_BASE_URL = optional OpenAI-compatible URL
    ANTHROPIC_API_KEY / OPENAI_API_KEY
-   'openai' = any OpenAI-compatible server: Ollama (http://localhost:11434/v1), Groq, OpenRouter, OpenAI...
+   'openai' defaults to OpenAI's API and gpt-6-luna; set OEL_LLM_BASE_URL for Ollama, vLLM, Mistral, or another compatible server.
    'mock'   = a scripted STUB, NOT an LLM. Only for testing the pipeline offline. Never report mock numbers as LLM results.
 Every LLM reply is cached in results/llm_cache.json, so re-running run_all.py reproduces the same tables without new calls.
 """
 import os, re, sys, json, hashlib, math, time
 import requests
+from dotenv import load_dotenv
 from members import STAMP
 from src.dispatch_tools import Env, REQUESTS, TOOLS, ground_truth
 from src.tune_c import wilson
 
 RESULTS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results")
 CACHE_FILE = os.path.join(RESULTS, "llm_cache.json")
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"), override=True)
 
 
 # ------------------------------------------------------------------ backends
@@ -31,6 +33,16 @@ def post_json(url, headers, payload, timeout=90):
     if r.status_code in (429, 500, 502, 503, 504):
         raise Transient(f"HTTP {r.status_code}")
     return r
+
+
+def provider_error(provider, status_code):
+    """Return a safe API error without echoing provider response bodies or secrets."""
+    if status_code in (401, 403):
+        return (f"{provider} rejected the configured credentials (HTTP {status_code}). "
+                "Check that the API key is valid, active, and belongs to the configured endpoint.")
+    if status_code == 404:
+        return f"{provider} could not find the configured model or endpoint (HTTP 404). Check the model and base URL."
+    return f"{provider} returned HTTP {status_code}. Check the provider settings and try again."
 
 
 class Cache:
@@ -69,26 +81,34 @@ class AnthropicBackend(HTTPBackend):
                       {"x-api-key": os.environ["ANTHROPIC_API_KEY"], "anthropic-version": "2023-06-01", "content-type": "application/json"},
                       {"model": self.model, "max_tokens": 1000, "temperature": 0, "system": system, "messages": messages}, 120)
         if r.status_code != 200:
-            raise RuntimeError(f"Anthropic API error {r.status_code}: {r.text[:300]}  (check ANTHROPIC_API_KEY / OEL_LLM_MODEL)")
+            raise RuntimeError(provider_error("Anthropic", r.status_code))
         return r.json()["content"][0]["text"]
 
 
 class OpenAICompatBackend(HTTPBackend):
     def _call(self, system, messages):
-        base = os.environ.get("OEL_LLM_BASE_URL", "http://localhost:11434/v1").rstrip("/")
+        base = os.environ.get("OEL_LLM_BASE_URL", "https://api.openai.com/v1").rstrip("/")
         hdr = {"content-type": "application/json"}
         host = base.lower()
-        provider_key = "OLLAMA_API_KEY" if "ollama.com" in host else "MISTRAL_API_KEY" if "mistral.ai" in host else None
+        provider_key = ("OLLAMA_API_KEY" if "ollama.com" in host else
+                        "MISTRAL_API_KEY" if "mistral.ai" in host else None)
         api_key = (os.environ.get("OEL_LLM_API_KEY") or
                    (os.environ.get(provider_key) if provider_key else None) or
                    os.environ.get("VLLM_API_KEY") or os.environ.get("OPENAI_API_KEY"))
         if api_key:
             hdr["authorization"] = "Bearer " + api_key
+        token_limit = ("max_completion_tokens" if "api.openai.com" in host else "max_tokens")
+        payload = {"model": self.model, token_limit: 256,
+                   "messages": [{"role": "system", "content": system}] + messages}
+        if "api.openai.com" not in host:
+            payload["temperature"] = 0
         r = post_json(base + "/chat/completions", hdr,
-                      {"model": self.model, "temperature": 0, "max_tokens": 500,
-                       "messages": [{"role": "system", "content": system}] + messages}, 90)
+                      payload, 90)
         if r.status_code != 200:
-            raise RuntimeError(f"LLM server error {r.status_code}: {r.text[:300]}  (check OEL_LLM_BASE_URL / OEL_LLM_MODEL)")
+            provider = ("OpenAI" if "api.openai.com" in host else
+                        "Ollama" if "ollama.com" in host else
+                        "Mistral" if "mistral.ai" in host else "OpenAI-compatible provider")
+            raise RuntimeError(provider_error(provider, r.status_code))
         return r.json()["choices"][0]["message"]["content"]
 
 
@@ -122,14 +142,15 @@ class MockBackend:
 
 
 def make_backend():
-    kind = os.environ.get("OEL_LLM_BACKEND", "mock").lower()
+    default_backend = "openai" if os.environ.get("OPENAI_API_KEY") else "mock"
+    kind = os.environ.get("OEL_LLM_BACKEND", default_backend).lower()
     if kind == "mock":
         return MockBackend()
     cache = Cache()
     if kind == "anthropic":
         return AnthropicBackend("anthropic", os.environ.get("OEL_LLM_MODEL", "claude-haiku-5-5"), cache)
     if kind == "openai":
-        return OpenAICompatBackend("openai", os.environ.get("OEL_LLM_MODEL", "llama3.1:8b"), cache)
+        return OpenAICompatBackend("openai", os.environ.get("OEL_LLM_MODEL", "gpt-6-luna"), cache)
     raise SystemExit(f"unknown OEL_LLM_BACKEND '{kind}' (use anthropic | openai | mock)")
 
 
