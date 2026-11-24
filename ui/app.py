@@ -196,10 +196,39 @@ with tab_plan:
             r["ms"] = (time.perf_counter() - t0) * 1e3
             st.session_state["last"] = (algo, stops, r)
     algo_u, stops_u, r = st.session_state["last"]
+    planned_route = route_cells(w, r["actions"]) if r["solved"] else None
+    if planned_route:
+        progress_col, speed_col, animate_col = st.columns([2, 1, 1])
+        live_step = progress_col.slider("Agent location along route", 0, len(planned_route) - 1, 0,
+                                        key="planner_live_step")
+        live_speed = speed_col.slider("Playback speed (sec/step)", 0.01, 0.15, 0.04, 0.01,
+                                      key="planner_live_speed")
+        animate_route = animate_col.button("▶ Run route", type="primary", key="animate_planned_route")
     left, right = st.columns([3, 2])
     with left:
-        st.pyplot(draw_3d(w, route_cells(w, r["actions"]) if r["solved"] else None,
-                          f"{algo_u}: parcels {stops_u}"), clear_figure=True)
+        chart = st.empty()
+        if planned_route:
+            if animate_route:
+                frame_step = max(1, (len(planned_route) - 1) // 59)
+                frames = list(range(0, len(planned_route), frame_step))
+                if frames[-1] != len(planned_route) - 1:
+                    frames.append(len(planned_route) - 1)
+                progress = st.progress(0)
+                for frame_number, step in enumerate(frames, 1):
+                    fig = draw_3d(w, planned_route, f"{algo_u}: parcels {stops_u} | move {step}/{len(planned_route) - 1}",
+                                  agent=planned_route[step], trail=planned_route[:step + 1])
+                    chart.pyplot(fig, clear_figure=True)
+                    plt.close(fig)
+                    progress.progress(frame_number / len(frames))
+                    time.sleep(live_speed)
+            else:
+                current = planned_route[live_step]
+                fig = draw_3d(w, planned_route, f"{algo_u}: parcels {stops_u} | move {live_step}/{len(planned_route) - 1}",
+                              agent=current, trail=planned_route[:live_step + 1])
+                chart.pyplot(fig, clear_figure=True)
+                st.caption(f"Current agent location: row {current[0]}, column {current[1]}")
+        else:
+            chart.pyplot(draw_3d(w, None, f"{algo_u}: parcels {stops_u}"), clear_figure=True)
         st.caption("3D height represents terrain cost; black columns are blocked cells.")
     with right:
         st.subheader("Result")
