@@ -25,7 +25,7 @@ from ui.three_scene import show_delivery_scene
 from ui.route_graph import show_route_graph
 from ui.action_graph import show_action_graph
 
-st.set_page_config(page_title="Autonomous Delivery Agent", layout="wide")
+st.set_page_config(page_title="Autonomous Delivery Agent", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
@@ -37,10 +37,8 @@ html,body,[class*="css"] { font-family:'DM Sans',sans-serif;color:var(--ink); }
 [data-testid="stHeader"] { background:rgba(243,246,244,.96); }
 [data-testid="stToolbar"] { right:1rem; }
 [data-testid="stAppViewContainer"] > .main .block-container { max-width:1500px;padding:2.1rem 3rem 3.5rem; }
-[data-testid="stSidebar"] { background:var(--sidebar);border-right:1px solid #d3dfd9; }
-[data-testid="stSidebar"] * { color:#203b36; }
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p { color:#4b635d; }
-[data-testid="stSidebar"] hr { border-color:#cedbd5; }
+.stApp [data-testid="stSidebar"],.stApp [data-testid="stSidebarCollapsedControl"],
+.stApp button[data-testid="collapsedControl"] { display:none!important; }
 .brand-lockup { display:flex;align-items:center;gap:12px;padding:8px 2px 22px; }
 .brand-mark { width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;
   background:#14786f;font:800 17px Manrope,sans-serif; }
@@ -75,7 +73,10 @@ div[data-testid="stRadio"] [role="radiogroup"] label * { color:inherit!important
 div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) { background:#14786f!important;border-color:#14786f!important;color:#fff!important; }
 div[data-testid="stSelectbox"] label,div[data-testid="stSlider"] label,div[data-testid="stMultiSelect"] label,
 div[data-testid="stNumberInput"] label,div[data-testid="stTextArea"] label { color:#405a54;font-size:13px;font-weight:700; }
-div[data-testid="stSelectbox"] [data-baseweb="select"] > div,div[data-testid="stMultiSelect"] [data-baseweb="select"] > div { border-radius:8px;background:#fff!important; }
+div[data-testid="stSelectbox"] [data-baseweb="select"],div[data-testid="stMultiSelect"] [data-baseweb="select"] { background:#fff!important;color:#172b29!important;border-radius:8px; }
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div,div[data-testid="stMultiSelect"] [data-baseweb="select"] > div,
+div[data-testid="stSelectbox"] [role="combobox"],div[data-testid="stMultiSelect"] [role="combobox"] { border-radius:8px;background:#fff!important;color:#172b29!important; }
+div[data-testid="stSelectbox"] [data-baseweb="select"] *,div[data-testid="stMultiSelect"] [data-baseweb="select"] * { color:#172b29!important; }
 [data-testid="stSelectbox"] input,[data-testid="stMultiSelect"] input { color:#172b29!important;background:transparent!important; }
 [data-testid="stNumberInputContainer"] { background:#fff!important;border:1px solid #cbd9d2!important;border-radius:8px!important;overflow:hidden; }
 [data-testid="stNumberInputContainer"] input { background:#fff!important;color:#172b29!important;caret-color:#14786f; }
@@ -87,7 +88,6 @@ div[data-testid="stSelectbox"] [data-baseweb="select"] > div,div[data-testid="st
 [data-testid="stTextAreaRootElement"] textarea::placeholder,[data-testid="stNumberInputContainer"] input::placeholder { color:#778982!important; }
 [data-testid="stSlider"] [role="group"] > div > div[data-rac][style*="position: absolute"] { background:#14786f!important; }
 [data-testid="stCaptionContainer"] { color:#536a64;font-size:14px;line-height:1.5; }
-[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color:#304c46;font-size:14px;font-weight:600; }
 .team-credit { margin-top:14px;padding:15px 17px;border:1px solid #d5e1db;border-radius:10px;background:#e9efeb;
   color:#304c46;font-size:15px;font-weight:600;line-height:1.75; }
 .team-credit strong { color:#173a33;font-weight:800; }
@@ -245,24 +245,6 @@ def route_cells(w, actions):
 
 
 w = get_world()
-
-with st.sidebar:
-    st.markdown("""
-    <div class="brand-lockup"><div class="brand-mark">AD</div><div>
-      <div class="brand-name">Autonomous Delivery</div><div class="brand-sub">Operations console</div>
-    </div></div>
-    """, unsafe_allow_html=True)
-    st.markdown("#### Workspace")
-    st.markdown("**Fleet simulation**\n\nInstance `" + str(w.inst["instance_id"]) + "`")
-    st.markdown("---")
-    st.markdown("#### Environment")
-    st.caption(f"{w.n} × {w.n} delivery grid")
-    st.caption(f"Rival: {w.inst['adversary']} · depth {w.inst['adversary_search_depth']}")
-    st.caption(f"Slip probability: {w.slip_p:.0%}")
-    st.markdown("---")
-    st.markdown("#### Project team")
-    for member_name, member_id in MEMBERS:
-        st.caption(f"{member_name} · {member_id}")
 
 header_left, header_right = st.columns([5, 1.4], vertical_alignment="center")
 with header_left:
