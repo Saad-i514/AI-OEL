@@ -77,10 +77,16 @@ class OpenAICompatBackend(HTTPBackend):
     def _call(self, system, messages):
         base = os.environ.get("OEL_LLM_BASE_URL", "http://localhost:11434/v1").rstrip("/")
         hdr = {"content-type": "application/json"}
-        if os.environ.get("OPENAI_API_KEY"):
-            hdr["authorization"] = "Bearer " + os.environ["OPENAI_API_KEY"]
+        host = base.lower()
+        provider_key = "OLLAMA_API_KEY" if "ollama.com" in host else "MISTRAL_API_KEY" if "mistral.ai" in host else None
+        api_key = (os.environ.get("OEL_LLM_API_KEY") or
+                   (os.environ.get(provider_key) if provider_key else None) or
+                   os.environ.get("VLLM_API_KEY") or os.environ.get("OPENAI_API_KEY"))
+        if api_key:
+            hdr["authorization"] = "Bearer " + api_key
         r = post_json(base + "/chat/completions", hdr,
-                      {"model": self.model, "temperature": 0, "messages": [{"role": "system", "content": system}] + messages}, 90)
+                      {"model": self.model, "temperature": 0, "max_tokens": 500,
+                       "messages": [{"role": "system", "content": system}] + messages}, 90)
         if r.status_code != 200:
             raise RuntimeError(f"LLM server error {r.status_code}: {r.text[:300]}  (check OEL_LLM_BASE_URL / OEL_LLM_MODEL)")
         return r.json()["choices"][0]["message"]["content"]
