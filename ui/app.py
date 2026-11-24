@@ -63,9 +63,11 @@ html,body,[class*="css"] { font-family:'DM Sans',sans-serif;color:var(--ink); }
 [data-testid="stTabs"] [data-testid="stTab"] .react-aria-SelectionIndicator { display:none!important; }
 [data-testid="stVerticalBlockBorderWrapper"] { border-color:var(--line)!important;border-radius:12px!important;background:#fff; }
 [data-testid="stButton"] button { border-radius:8px;font-weight:700;min-height:43px;transition:background .16s ease,border-color .16s ease; }
-[data-testid="stButton"] button:hover { border-color:#80aaa0; }
-[data-testid="stButton"] button[kind="primary"] { background:var(--accent);border-color:var(--accent);box-shadow:none; }
-[data-testid="stButton"] button[kind="primary"]:hover { background:var(--accent-dark);border-color:var(--accent-dark); }
+[data-testid="stButton"] button:not([kind="primary"]) { color:#24433c!important;background:#e4ebe7!important;border:1px solid #c9d8d0!important; }
+[data-testid="stButton"] button:not([kind="primary"]):hover { color:#0e625a!important;background:#d6e5de!important;border-color:#b6cec3!important; }
+[data-testid="stButton"] button[kind="primary"] { color:#fff!important;background:var(--accent)!important;border-color:var(--accent)!important;box-shadow:none; }
+[data-testid="stButton"] button[kind="primary"] * { color:#fff!important; }
+[data-testid="stButton"] button[kind="primary"]:hover { background:var(--accent-dark)!important;border-color:var(--accent-dark)!important; }
 div[data-testid="stRadio"] [role="radiogroup"] { display:flex;flex-direction:row!important;gap:8px; }
 div[data-testid="stRadio"] [role="radiogroup"] label { min-height:46px;padding:10px 17px!important;border:1px solid #d3dfd9;border-radius:9px;background:#fff;color:#304c46!important;
   font-size:15px!important;font-weight:700!important;opacity:1!important; }
