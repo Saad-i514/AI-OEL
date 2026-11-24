@@ -1,0 +1,13 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+# 4 scenarios, mean and 95% CI half-width
+algorithm,cost,cost_ci,nodes,nodes_ci,ms,ms_ci,peak,peak_ci
+UCS,274.00,90.50,3855.75,1089.41,93.25,20.26,2456.50,683.08
+A* Manhattan farthest,274.00,90.50,3425.50,1047.96,140.11,64.20,2137.00,527.16
+A* OWN,274.00,90.50,1649.25,990.42,100.32,43.64,1239.25,640.11
+Weighted A* (W=2),281.50,94.27,1345.75,1051.06,87.79,52.18,983.25,670.48
+
+ablation,nodes,nodes_ci,ms,ms_ci
+A* OWN,1649.25,990.42,100.32,43.64
+OWN - MST term,2031.50,1050.24,109.18,53.26
+OWN - fuel term,1763.25,996.34,94.46,45.91
+OWN - both,2390.75,1029.97,115.55,40.44

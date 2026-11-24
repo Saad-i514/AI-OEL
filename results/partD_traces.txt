@@ -1,0 +1,385 @@
+Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+backend=mock model=scripted-stub
+Trace lines map to the Sense-Reason-Act cycle.
+
+--- request 1 [raw]: Deliver all the parcels with the cheapest route.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNWWWSWNEEEEESSSSSSWWSWSSSWS", "cost": 347, "steps": 95, "delivery_order": [3, 5, 6, 2, 1, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 2 [raw]: Just deliver stop 3, nothing else.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      route_planner {"stops": [3]}
+   SENSE   (Observation): {"error": "tool 'route_planner' not found"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 3 [raw]: Deliver stops 1 and 2 only.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [1, 2]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENEESEENENNWWNNENENNENEENNESSSSSS", "cost": 260, "steps": 72, "delivery_order": [2, 1], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 4 [raw]: Plan a route for stops 4, 5 and 6.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5, 6]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENEESEENESNNNWWNNENENNNWN", "cost": 218, "steps": 64, "delivery_order": [5, 4, 6], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 5 [raw]: Deliver all parcels, but stop 3 must be the first one delivered.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNWWWSWNEEEEESSSSSSWWSWSSSWS", "cost": 347, "steps": 95, "delivery_order": [3, 5, 6, 2, 1, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 6 [raw]: Deliver stops 2, 5 and 6, with stop 6 first.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [2, 5, 9]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENEESEENENNWWNNENENNENEENNE", "cost": 224, "steps": 66, "delivery_order": [5, 2], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 7 [raw]: Deliver stops 4 and 5 and stay out of the fords.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "avoid_terrain": ["swamp"]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENNNEEENENNWNNNW", "cost": 79, "steps": 31, "delivery_order": [4, 5], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 8 [raw]: Deliver stop 5 without crossing any ford.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [5], "avoid_terrain": ["swamp"]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENNNEENNNNNN", "cost": 75, "steps": 27, "delivery_order": [5], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 9 [raw]: Deliver all parcels with a total cost of at most 350.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"max_cost": "350 units"}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNWWWSWNEEEEESSSSSSWWSWSSSWS", "cost": 347, "steps": 95, "delivery_order": [3, 5, 6, 2, 1, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 10 [raw]: Deliver stops 3, 4 and 5 for a total cost under 120.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [3, 4, 5], "max_cost": 119}
+   SENSE   (Observation): {"feasible": false, "reason": "best route found costs 183 which exceeds max_cost 119"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "best route found costs 183 which exceeds max_cost 119"}
+
+--- request 11 [raw]: Deliver stops 4 and 5, stop 5 first, and avoid fords.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "avoid_terrain": ["ford"]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENNNEEESEESEENENEEENEENNNWNWNNNW", "cost": 99, "steps": 37, "delivery_order": [4, 5], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 12 [raw]: Deliver stops 4 and 5, no fords, total cost at most 120.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "avoid_terrain": ["ford"], "max_cost": 120}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENNNEEESEESEENENEEENEENNNWNWNNNW", "cost": 99, "steps": 37, "delivery_order": [4, 5], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 13 [raw]: Deliver stops 2, 3 and 4 with stop 4 first, and keep the cost at or below 320.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [2, 3, 4], "max_cost": 320}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNEWSSWSSSSSWSSSWS", "cost": 301, "steps": 85, "delivery_order": [3, 2, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 14 [raw]: Deliver all parcels, avoiding both mud and ford.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"avoid_terrain": ["mud", "ford"]}
+   SENSE   (Observation): {"feasible": false, "reason": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+
+--- request 15 [raw]: Deliver stops 5 and 6, stop 6 first, no fords, cost at most 160.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [5, 6], "first": 6, "avoid_terrain": ["ford"], "max_cost": 160}
+   SENSE   (Observation): {"feasible": false, "reason": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+
+--- request 16 [raw]: Deliver every parcel for less than 100 in total cost.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"max_cost": 99}
+   SENSE   (Observation): {"feasible": false, "reason": "best route found costs 347 which exceeds max_cost 99"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "best route found costs 347 which exceeds max_cost 99"}
+
+--- request 17 [raw]: Deliver all parcels but never drive on a road.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"avoid_terrain": ["road"]}
+   SENSE   (Observation): {"feasible": false, "reason": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+
+--- request 18 [raw]: Deliver stops 1, 2 and 3, starting with stop 2.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [1, 2, 3]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNESSSSSS", "cost": 284, "steps": 76, "delivery_order": [3, 2, 1], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 19 [raw]: Deliver every parcel except stop 6.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [1, 2, 3, 4, 5]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNESSSSSSWWSWSSSWS", "cost": 321, "steps": 85, "delivery_order": [3, 5, 2, 1, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 20 [raw]: Deliver stops 4 and 5 using the fast greedy algorithm.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "algorithm": "greedy"}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEEENEEEEEENENNNEEESEENNNWNNWNNW", "cost": 109, "steps": 35, "delivery_order": [4, 5], "algorithm": "greedy"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 1 [validated]: Deliver all the parcels with the cheapest route.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNWWWSWNEEEEESSSSSSWWSWSSSWS", "cost": 347, "steps": 95, "delivery_order": [3, 5, 6, 2, 1, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 2 [validated]: Just deliver stop 3, nothing else.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      route_planner {"stops": [3]}
+   SENSE   (Observation): {"error": "REJECTED: unknown tool 'route_planner'. Valid tools: ['plan_route', 'simulate', 'fuel_report']"}
+step 2
+   REASON  (Thought):     The validator rejected my call; I will correct the arguments.
+   ACT     (Action):      plan_route {"stops": [3]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNWNENE", "cost": 142, "steps": 44, "delivery_order": [3], "algorithm": "astar"}
+step 3
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 3 [validated]: Deliver stops 1 and 2 only.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [1, 2]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENEESEENENNWWNNENENNENEENNESSSSSS", "cost": 260, "steps": 72, "delivery_order": [2, 1], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 4 [validated]: Plan a route for stops 4, 5 and 6.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5, 6]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENEESEENESNNNWWNNENENNNWN", "cost": 218, "steps": 64, "delivery_order": [5, 4, 6], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 5 [validated]: Deliver all parcels, but stop 3 must be the first one delivered.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNWWWSWNEEEEESSSSSSWWSWSSSWS", "cost": 347, "steps": 95, "delivery_order": [3, 5, 6, 2, 1, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 6 [validated]: Deliver stops 2, 5 and 6, with stop 6 first.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [2, 5, 9]}
+   SENSE   (Observation): {"error": "REJECTED: stops must be distinct integers in 1..6, got [2, 5, 9]"}
+step 2
+   REASON  (Thought):     The validator rejected my call; I will correct the arguments.
+   ACT     (Action):      plan_route {"stops": [2, 5, 6], "first": 6}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENEESEENENNWWNNENENNENEENNWWWSWNEEEEEWSSWSSSSSWSSSWW", "cost": 301, "steps": 91, "delivery_order": [6, 2, 5], "algorithm": "astar"}
+step 3
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 7 [validated]: Deliver stops 4 and 5 and stay out of the fords.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "avoid_terrain": ["swamp"]}
+   SENSE   (Observation): {"error": "REJECTED: avoid_terrain ['swamp'] invalid; valid terrains are ['road', 'grass', 'mud', 'ford']"}
+step 2
+   REASON  (Thought):     The validator rejected my call; I will correct the arguments.
+   ACT     (Action):      plan_route {"stops": [4, 5], "avoid_terrain": ["ford"]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENNNEEESEESEENENEEENEENNNWNWNNNW", "cost": 99, "steps": 37, "delivery_order": [4, 5], "algorithm": "astar"}
+step 3
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 8 [validated]: Deliver stop 5 without crossing any ford.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [5], "avoid_terrain": ["swamp"]}
+   SENSE   (Observation): {"error": "REJECTED: avoid_terrain ['swamp'] invalid; valid terrains are ['road', 'grass', 'mud', 'ford']"}
+step 2
+   REASON  (Thought):     The validator rejected my call; I will correct the arguments.
+   ACT     (Action):      plan_route {"stops": [5], "avoid_terrain": ["ford"]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENNNEEESEESEENENNNEENNNNNN", "cost": 79, "steps": 31, "delivery_order": [5], "algorithm": "astar"}
+step 3
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 9 [validated]: Deliver all parcels with a total cost of at most 350.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"max_cost": "350 units"}
+   SENSE   (Observation): {"error": "REJECTED: max_cost must be a positive number, got 350 units"}
+step 2
+   REASON  (Thought):     The validator rejected my call; I will correct the arguments.
+   ACT     (Action):      plan_route {"max_cost": 350}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNWWWSWNEEEEESSSSSSWWSWSSSWS", "cost": 347, "steps": 95, "delivery_order": [3, 5, 6, 2, 1, 4], "algorithm": "astar"}
+step 3
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 10 [validated]: Deliver stops 3, 4 and 5 for a total cost under 120.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [3, 4, 5], "max_cost": 119}
+   SENSE   (Observation): {"feasible": false, "reason": "best route found costs 183 which exceeds max_cost 119"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "best route found costs 183 which exceeds max_cost 119"}
+
+--- request 11 [validated]: Deliver stops 4 and 5, stop 5 first, and avoid fords.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "avoid_terrain": ["ford"]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENNNEEESEESEENENEEENEENNNWNWNNNW", "cost": 99, "steps": 37, "delivery_order": [4, 5], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 12 [validated]: Deliver stops 4 and 5, no fords, total cost at most 120.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "avoid_terrain": ["ford"], "max_cost": 120}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENNNEEESEESEENENEEENEENNNWNWNNNW", "cost": 99, "steps": 37, "delivery_order": [4, 5], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 13 [validated]: Deliver stops 2, 3 and 4 with stop 4 first, and keep the cost at or below 320.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [2, 3, 4], "max_cost": 320}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNEWSSWSSSSSWSSSWS", "cost": 301, "steps": 85, "delivery_order": [3, 2, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 14 [validated]: Deliver all parcels, avoiding both mud and ford.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"avoid_terrain": ["mud", "ford"]}
+   SENSE   (Observation): {"feasible": false, "reason": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+
+--- request 15 [validated]: Deliver stops 5 and 6, stop 6 first, no fords, cost at most 160.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [5, 6], "first": 6, "avoid_terrain": ["ford"], "max_cost": 160}
+   SENSE   (Observation): {"feasible": false, "reason": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+
+--- request 16 [validated]: Deliver every parcel for less than 100 in total cost.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"max_cost": 99}
+   SENSE   (Observation): {"feasible": false, "reason": "best route found costs 347 which exceeds max_cost 99"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "best route found costs 347 which exceeds max_cost 99"}
+
+--- request 17 [validated]: Deliver all parcels but never drive on a road.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"avoid_terrain": ["road"]}
+   SENSE   (Observation): {"feasible": false, "reason": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+step 2
+   REASON  (Thought):     The planner says it is impossible.
+   ACT     (Action):      FINAL {"status": "infeasible", "message": "no route exists under these constraints (blocked terrain, fuel or one-way streets)"}
+
+--- request 18 [validated]: Deliver stops 1, 2 and 3, starting with stop 2.  ->  FAIL
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [1, 2, 3]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNESSSSSS", "cost": 284, "steps": 76, "delivery_order": [3, 2, 1], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 19 [validated]: Deliver every parcel except stop 6.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [1, 2, 3, 4, 5]}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEENEEEEEEENENEEENEENNWWSWWWNNWWWNNNENENWSEESEENENNWWNNENENNENEENNESSSSSSWWSWSSSWS", "cost": 321, "steps": 85, "delivery_order": [3, 5, 2, 1, 4], "algorithm": "astar"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+--- request 20 [validated]: Deliver stops 4 and 5 using the fast greedy algorithm.  ->  SUCCESS
+step 1
+   REASON  (Thought):     I will call the route planner with the constraints from the request.
+   ACT     (Action):      plan_route {"stops": [4, 5], "algorithm": "greedy"}
+   SENSE   (Observation): {"feasible": true, "actions": "SEESEEENEEEEEENENNNEEESEENNNWNNWNNW", "cost": 109, "steps": 35, "delivery_order": [4, 5], "algorithm": "greedy"}
+step 2
+   REASON  (Thought):     I have a valid route.
+   ACT     (Action):      FINAL {"status": "ok", "message": "route found"}
+
+Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)

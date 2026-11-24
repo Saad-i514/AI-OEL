@@ -1,0 +1,6 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+heuristic,edges,consistency_violations,worst_gap,admissibility_violations_on_optimal_path
+h=0 (UCS),28034,0,0,0
+Manhattan*cmin nearest,28034,0,0,0
+Manhattan*cmin farthest,28034,0,0,0
+OWN (full),28034,0,0,0

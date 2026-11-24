@@ -1,0 +1,5 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+case,n,loop_ms,numpy_ms,speedup
+your instance,22,0.53656,0.05420,9.90
+synthetic 100x100,100,9.86020,0.30119,32.74
+synthetic 500x500,500,257.44770,8.73650,29.47

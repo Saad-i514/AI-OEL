@@ -1,0 +1,43 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+# backend=mock model=scripted-stub
+mode,rid,level,expect_ok,success,why,cost,optimal,tool_calls,rejected,wrong_tool,bad_args,format_errors
+raw,1,1,True,True,,347,347,1,0,0,0,0
+raw,2,1,True,False,claimed success without a plan,,142,1,0,1,0,0
+raw,3,1,True,True,,260,260,1,0,0,0,0
+raw,4,1,True,True,,218,218,1,0,0,0,0
+raw,5,2,True,True,,347,347,1,0,0,0,0
+raw,6,2,True,False,ignored a constraint,,301,1,0,0,1,0
+raw,7,2,True,False,ignored a constraint,,99,1,0,0,1,0
+raw,8,2,True,False,ignored a constraint,,79,1,0,0,1,0
+raw,9,2,True,True,,347,347,1,0,0,1,0
+raw,10,2,False,True,,,,1,0,0,0,0
+raw,11,3,True,False,ignored a constraint,,101,1,0,0,0,0
+raw,12,3,True,True,,99,99,1,0,0,0,0
+raw,13,3,True,False,ignored a constraint,,312,1,0,0,0,0
+raw,14,3,False,True,,,,1,0,0,0,0
+raw,15,3,False,True,,,,1,0,0,0,0
+raw,16,4,False,True,,,,1,0,0,0,0
+raw,17,4,False,True,,,,1,0,0,0,0
+raw,18,4,True,False,ignored a constraint,,348,1,0,0,0,0
+raw,19,4,True,True,,321,321,1,0,0,0,0
+raw,20,4,True,True,,109,109,1,0,0,0,0
+validated,1,1,True,True,,347,347,1,0,0,0,0
+validated,2,1,True,True,,142,142,2,1,1,0,0
+validated,3,1,True,True,,260,260,1,0,0,0,0
+validated,4,1,True,True,,218,218,1,0,0,0,0
+validated,5,2,True,True,,347,347,1,0,0,0,0
+validated,6,2,True,True,,301,301,2,1,0,1,0
+validated,7,2,True,True,,99,99,2,1,0,1,0
+validated,8,2,True,True,,79,79,2,1,0,1,0
+validated,9,2,True,True,,347,347,2,1,0,1,0
+validated,10,2,False,True,,,,1,0,0,0,0
+validated,11,3,True,False,ignored a constraint,,101,1,0,0,0,0
+validated,12,3,True,True,,99,99,1,0,0,0,0
+validated,13,3,True,False,ignored a constraint,,312,1,0,0,0,0
+validated,14,3,False,True,,,,1,0,0,0,0
+validated,15,3,False,True,,,,1,0,0,0,0
+validated,16,4,False,True,,,,1,0,0,0,0
+validated,17,4,False,True,,,,1,0,0,0,0
+validated,18,4,True,False,ignored a constraint,,348,1,0,0,0,0
+validated,19,4,True,True,,321,321,1,0,0,0,0
+validated,20,4,True,True,,109,109,1,0,0,0,0

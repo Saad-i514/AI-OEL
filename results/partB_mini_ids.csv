@@ -1,0 +1,10 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+# mini problem, memory cap demo
+algorithm,solved,cost,expanded,generated,peak_stored,ms,KB,note
+A*(h=farthest),True,46,78,123,78,2.62,5,
+"A*, memory cap 50",False,,38,64,51,0.99,3,limit hit
+UCS,True,46,106,171,111,3.22,5,
+BFS,True,60,148,185,121,2.01,6,
+DLS(l=11),False,,78677,78676,12,701.51,7,cutoff
+DLS(l=12),True,60,53199,53199,13,523.01,7,solution
+IDS,True,60,167191,167179,13,1705.06,7,depth 12

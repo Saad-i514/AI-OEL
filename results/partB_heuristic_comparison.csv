@@ -1,0 +1,7 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+# heuristic comparison
+algorithm,solved,cost,expanded,generated,peak_stored,ms,KB,note
+UCS (h=0),True,347,10564,14626,6454,260.94,1761,
+A* Manhattan nearest,True,347,9743,13498,5913,398.29,1416,
+A* Manhattan farthest,True,347,9126,12613,5574,280.85,1316,
+A* OWN,True,347,3101,4457,2248,125.87,573,

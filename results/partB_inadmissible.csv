@@ -1,0 +1,8 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+# weighted A* (inadmissible)
+algorithm,solved,cost,expanded,generated,peak_stored,ms,KB,note
+"A* OWN (W=1, optimal)",True,347,3101,4457,2248,125.44,573,
+Weighted A* W=1.5,True,347,2174,3177,1793,95.22,468,
+Weighted A* W=2,True,353,1628,2420,1489,80.02,370,
+Weighted A* W=3,True,375,1439,2134,1319,70.05,349,
+Weighted A* W=5,True,375,1559,2329,1366,75.72,366,

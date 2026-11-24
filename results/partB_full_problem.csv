@@ -1,0 +1,8 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+# full problem
+algorithm,solved,cost,expanded,generated,peak_stored,ms,KB,note
+BFS,True,369,17324,18003,5499,239.43,1793,
+UCS,True,347,10564,14626,6454,348.03,1761,
+Greedy,True,564,11553,14638,3375,347.48,1287,
+A*(h=nearest),True,347,9743,13498,5913,382.95,1416,
+A*(h=farthest),True,347,9126,12613,5574,302.91,1316,

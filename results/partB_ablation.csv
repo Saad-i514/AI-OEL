@@ -1,0 +1,7 @@
+# Capt Abdul Majid Khan (534908) | Muhammad Saad Bin Mazhar (508313) | Tooba Akram (534701) | Abeeha Noor (534659)
+# ablation of own heuristic
+algorithm,solved,cost,expanded,generated,peak_stored,ms,KB,note
+OWN full,True,347,3101,4457,2248,127.93,573,
+OWN - MST term,True,347,4188,6080,2980,155.99,757,
+OWN - fuel term,True,347,3127,4490,2272,124.68,577,
+OWN - both,True,347,4955,7159,3478,174.56,977,
