@@ -7,6 +7,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import streamlit as st
 from members import MEMBERS, STAMP
 from oel_instance import TERRAINS
@@ -64,6 +65,96 @@ def draw(w, route=None, title="", agent=None, rival=None, trail=None):
     return fig
 
 
+def draw_3d(w, route=None, title="", agent=None, rival=None, trail=None):
+    """Render terrain as raised tiles and barriers, with route markers above them."""
+    colors = ["#d0d0d0", "#aed581", "#a1887f", "#81d4fa", "#222222"]
+    n = w.grid.shape[0]
+    heights = np.zeros((n, n), dtype=float)
+    facecolors = []
+    faces = []
+
+    def shade(color, factor):
+        from matplotlib.colors import to_rgb, to_hex
+        return to_hex(np.asarray(to_rgb(color)) * factor)
+
+    for row in range(n):
+        for col in range(n):
+            terrain = int(w.grid[row, col])
+            heights[row, col] = 11.0 if terrain < 0 else float(w.inst["terrain_cost"][TERRAINS[terrain]])
+
+    for row in range(n):
+        for col in range(n):
+            terrain = int(w.grid[row, col])
+            blocked = terrain < 0
+            height = heights[row, col]
+            x0, x1, y0, y1 = col - 0.5, col + 0.5, row - 0.5, row + 0.5
+            color = colors[4 if blocked else terrain]
+            faces.append([(x0, y0, height), (x1, y0, height), (x1, y1, height), (x0, y1, height)])
+            facecolors.append(color)
+            for dr, dc, side in ((-1, 0, (x0, y0, x1, y0)), (1, 0, (x1, y1, x0, y1)),
+                                 (0, -1, (x0, y1, x0, y0)), (0, 1, (x1, y0, x1, y1))):
+                nr, nc = row + dr, col + dc
+                base = heights[nr, nc] if 0 <= nr < n and 0 <= nc < n else 0.0
+                if base >= height:
+                    continue
+                sx0, sy0, sx1, sy1 = side
+                faces.append([(sx0, sy0, base), (sx1, sy1, base), (sx1, sy1, height), (sx0, sy0, height)])
+                facecolors.append(shade(color, 0.68))
+
+    fig = plt.figure(figsize=(9, 7.5))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.add_collection3d(Poly3DCollection(faces, facecolors=facecolors, edgecolors="white", linewidths=0.12))
+
+    # One-way streets are shown as small red arrows just above the tile tops.
+    for (row, col), neighbors in w.nbrs.items():
+        for nr, nc, _, _ in neighbors:
+            if (row, col) not in {(rr, cc) for rr, cc, _, _ in w.nbrs[(nr, nc)]}:
+                z = heights[row, col] + 0.18
+                ax.quiver(col, row, z, nc - col, nr - row, 0, color="crimson", linewidth=0.8,
+                          arrow_length_ratio=0.35, length=0.42, normalize=False)
+
+    def point_z(cell, offset=0.5):
+        return heights[cell[0], cell[1]] + offset
+
+    if route:
+        ys, xs = zip(*route)
+        zs = [point_z(cell, 0.25) for cell in route]
+        ax.plot(xs, ys, zs, color="royalblue", linewidth=3, zorder=10, label="planned route")
+    if trail and len(trail) > 1:
+        ys, xs = zip(*trail)
+        zs = [point_z(cell, 0.55) for cell in trail]
+        ax.plot(xs, ys, zs, color="#1746c7", linewidth=2.6, alpha=0.9, zorder=12, label="agent trail")
+
+    stations = np.asarray(w.stations)
+    if len(stations):
+        ax.scatter(stations[:, 1], stations[:, 0], [point_z(s, 0.5) for s in stations],
+                   marker="^", c="limegreen", edgecolors="k", s=75, depthshade=False, label="charging station")
+    ax.scatter([w.start[1]], [w.start[0]], [point_z(w.start, 0.65)], marker="s", c="red", s=85,
+               depthshade=False, label="depot")
+    stops = np.asarray(w.stops)
+    ax.scatter(stops[:, 1], stops[:, 0], [point_z(s, 0.65) for s in w.stops], marker="*", c="yellow",
+               edgecolors="k", s=150, depthshade=False, label="delivery stop")
+    if agent is not None:
+        ax.scatter([agent[1]], [agent[0]], [point_z(agent, 0.9)], marker="o", c="dodgerblue", edgecolors="k",
+                   s=120, depthshade=False, label="agent")
+    if rival is not None:
+        ax.scatter([rival[1]], [rival[0]], [point_z(rival, 0.9)], marker="X", c="magenta", edgecolors="k",
+                   s=140, depthshade=False, label="rival")
+
+    handles = [Patch(color=colors[i], label=f"{terrain} ({w.inst['terrain_cost'][terrain]})")
+               for i, terrain in enumerate(TERRAINS)]
+    handles.append(Patch(color=colors[4], label="blocked barrier"))
+    ax.legend(handles=handles + ax.get_legend_handles_labels()[0], loc="upper left",
+              bbox_to_anchor=(1.01, 1.0), fontsize=8)
+    ax.set_xlim(-0.5, n - 0.5); ax.set_ylim(n - 0.5, -0.5); ax.set_zlim(0, 13)
+    ax.set_xlabel("Column"); ax.set_ylabel("Row"); ax.set_zlabel("Terrain cost / height")
+    ax.set_title(title + "\n" + STAMP, fontsize=8)
+    ax.view_init(elev=38, azim=-58)
+    ax.set_box_aspect((1, 1, 0.42))
+    fig.tight_layout()
+    return fig
+
+
 def route_cells(w, actions):
     r, c = w.start; cells = [(r, c)]
     for a in actions:
@@ -107,7 +198,9 @@ with tab_plan:
     algo_u, stops_u, r = st.session_state["last"]
     left, right = st.columns([3, 2])
     with left:
-        st.pyplot(draw(w, route_cells(w, r["actions"]) if r["solved"] else None, f"{algo_u}: parcels {stops_u}"))
+        st.pyplot(draw_3d(w, route_cells(w, r["actions"]) if r["solved"] else None,
+                          f"{algo_u}: parcels {stops_u}"), clear_figure=True)
+        st.caption("3D height represents terrain cost; black columns are blocked cells.")
     with right:
         st.subheader("Result")
         if r["solved"]:
@@ -127,7 +220,7 @@ with tab_game:
     slip = g1.slider("Slip probability", 0.0, 0.5, float(gw_world.slip_p), 0.02)
     seed = g2.number_input("Game seed (sets the rival's start cell)", 0, 10**9, 14781596)
     depth = g3.slider("Rival search depth", 2, 6, int(gw_world.inst["adversary_search_depth"]))
-    play = st.button("Play one game (takes a few seconds)", type="primary")
+    play = st.button("Simulate one game", type="primary")
     if play:
         trace = []
         with st.spinner("Playing..."):
@@ -135,12 +228,28 @@ with tab_game:
         st.session_state["game"] = (trace, stats)
     if "game" in st.session_state:
         trace, stats = st.session_state["game"]
-        turn = st.slider("Turn", 0, len(trace) - 1, 0)
-        a_id, r_id = trace[turn]
-        trail = [gw.rc[a] for a, _ in trace[:turn + 1]]
+        controls = st.columns([2, 2, 1])
+        turn = controls[0].slider("Turn", 0, len(trace) - 1, 0)
+        delay = controls[1].slider("Animation speed (seconds per turn)", 0.02, 0.25, 0.06, 0.01)
+        animate = controls[2].button("▶ Animate route", type="primary")
         left, right = st.columns([3, 2])
         with left:
-            st.pyplot(draw(gw_world, None, f"Turn {turn} of {len(trace) - 1}", agent=gw.rc[a_id], rival=gw.rc[r_id], trail=trail))
+            chart = st.empty()
+            progress = st.progress(0) if animate else None
+            frame_step = max(1, (len(trace) - 1) // 119) if animate else 1
+            frames = list(range(0, len(trace), frame_step)) if animate else [turn]
+            if animate and frames[-1] != len(trace) - 1:
+                frames.append(len(trace) - 1)
+            for frame_index in frames:
+                a_id, r_id = trace[frame_index]
+                trail = [gw.rc[a] for a, _ in trace[:frame_index + 1]]
+                fig = draw_3d(gw_world, None, f"Turn {frame_index} of {len(trace) - 1}",
+                              agent=gw.rc[a_id], rival=gw.rc[r_id], trail=trail)
+                chart.pyplot(fig, clear_figure=True)
+                plt.close(fig)
+                if animate:
+                    progress.progress((frames.index(frame_index) + 1) / len(frames))
+                    time.sleep(delay)
         with right:
             st.subheader("Game result")
             why = stats.get("why", "")
